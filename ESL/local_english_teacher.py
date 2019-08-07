@@ -9,6 +9,7 @@ class Job910(object):
                            'pageIndex={}'.format(com_type, i) for i in range(1, max_page+1)]
 
     def get_data(self):
+        # requests：执行网络请求
         for url in self.start_urls:
             res = requests.get(url)
             page = url.split('=')[-1]
@@ -18,6 +19,7 @@ class Job910(object):
     @staticmethod
     def parse_data(res, page):
         if res.status_code == 200:
+            # etree: 解析html
             parsed = etree.HTML(res.text)
 
             title = parsed.xpath('//*[@class="position title"]/a/text()')
@@ -28,6 +30,7 @@ class Job910(object):
             update_time = parsed.xpath('//*[@class="time title2"]/text()')
             exp_title = parsed.xpath('//*[@class="exp title2"]/text()')
 
+            # pandas：将数据结构化地保存到文件
             data = pd.DataFrame({'title': title, 'link': link, 'salary': salary,
                                  'company': company, 'area': area, 'update_time': update_time,
                                  'exp_title': exp_title})
