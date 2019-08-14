@@ -23,10 +23,37 @@ class Job910(object):
             print(f'get data failed -- {p}, {res.status_code}') 
         else :
             print(f'get data success -- {page}')
-            with open('local-result-text.html', 'w') as f:
-                f.write(res.text)
-            pass
+            #with open('local-result-text.html', 'w') as f:
+            #    f.write(res.text)
+            #pass
+            parsed = etree.HTML(res.text)
 
+            tag = '//*[contains(@class, "position title")]/a/text()'
+            title = parsed.xpath(tag)
+            
+            tag = '//*[@class="area title2"]/text()'
+            area = parsed.xpath(tag)
+            
+            tag = '//*[@class="salary title"]/text()'
+            salary = parsed.xpath(tag)
+
+            tag = '//*[@class="time title2"]/text()'
+            time = parsed.xpath(tag)
+            
+            tag = '//*[@class="com title adclick"]/@href'
+            href = parsed.xpath(tag)
+            
+            tag = '//*[@class="com title adclick"]/text()'
+            school = parsed.xpath(tag)
+            
+            tag = '//*[@class="exp title2"]/text()'
+            exp = parsed.xpath(tag)
+            
+            result = pandas.DataFrame({'time': time ,'title': title ,'school': school ,'area': area ,'exp': exp ,'salary': salary ,'link': href })
+            result.to_csv('test-英语老师-local-2.csv', index = False, mode='a', header= page == 1  )
+            
+            print(f'parse and save data success -- {page}')
+            
     def parseTest(self):
         with open('local-result-text.html', 'r') as f:
             ss = f.read()
@@ -81,10 +108,10 @@ class Job910(object):
             
 if __name__ == '__main__':
     base_url = 'http://www.job910.com/search.aspx?sortField=1&sort=1&pageSize=20&pageIndex={}&keyword=英语老师'
-    pages = 1
+    pages = 31
     job = Job910(base_url, pages)
-#    job.getData()
-    job.parseTest()
+    job.getData()
+#    job.parseTest()
 
 
 
